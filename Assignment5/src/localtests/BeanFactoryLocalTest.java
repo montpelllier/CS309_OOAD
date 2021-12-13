@@ -25,13 +25,13 @@ public class BeanFactoryLocalTest {
     }
 
     @Test
-    public void testResolveWithNoDependency() {
+    public void testResolveWithNoDependency() {//pass
         A instance = beanFactory.createInstance(A.class);
         assertNotNull(instance);
     }
 
     @Test
-    public void testWithConstructorDependency() {
+    public void testWithConstructorDependency() {//pass
         B instance = beanFactory.createInstance(B.class);
         assertNotNull(instance);
         assertNotNull(instance.getCDep());
