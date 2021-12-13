@@ -39,7 +39,7 @@ public class BeanFactoryLocalTest {
     }
 
     @Test
-    public void testWithAnnotationDependency() {
+    public void testWithAnnotationDependency() {//pass
         G instance = beanFactory.createInstance(G.class);
         assertNotNull(instance);
         assertNotNull(instance.getCDep());
@@ -47,7 +47,7 @@ public class BeanFactoryLocalTest {
     }
 
     @Test
-    public void testWithMethodDependency() {
+    public void testWithMethodDependency() {//pass
         H instance = beanFactory.createInstance(H.class);
         assertNotNull(instance);
         assertNotNull(instance.getCDep());
@@ -55,7 +55,7 @@ public class BeanFactoryLocalTest {
     }
 
     @Test
-    public void testMixedDependencies() {
+    public void testMixedDependencies() {//pass
         I instance = beanFactory.createInstance(I.class);
         assertNotNull(instance);
         assertNotNull(instance.getADep());
@@ -64,21 +64,21 @@ public class BeanFactoryLocalTest {
     }
 
     @Test
-    public void testImplTypeForInterface() {
+    public void testImplTypeForInterface() {//pass
         E instance = beanFactory.createInstance(E.class);
         assertNotNull(instance);
         assertTrue(instance instanceof EImpl);
     }
 
     @Test
-    public void testImplTypeForAbstractClass() {
+    public void testImplTypeForAbstractClass() {//pass
         F instance = beanFactory.createInstance(F.class);
         assertNotNull(instance);
         assertTrue(instance instanceof FEnhanced);
     }
 
     @Test
-    public void testDependencyImpl() {
+    public void testDependencyImpl() {//pass
         K instance = beanFactory.createInstance(K.class);
         assertNotNull(instance);
         assertNotNull(instance.getEDep());

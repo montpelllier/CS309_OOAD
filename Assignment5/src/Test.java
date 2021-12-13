@@ -7,15 +7,20 @@ import testclass.*;
 
 public class Test {
     public static void main(String[] args) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        B Object = null;
+        E Object = null;
 //        int a = int.class.newInstance();
 //        System.out.println(a);
         BeanFactoryImpl beanFactory = new BeanFactoryImpl();
-        Object = beanFactory.createInstance(B.class);
-//        Constructor constructor = beanFactory.getConstructor(B.class);
-//        Object = (B) constructor.newInstance(C.class, D.class);
+        beanFactory.loadInjectProperties(new File("./Assignment5/local-inject.properties"));
+        beanFactory.loadValueProperties(new File("./Assignment5/local-value.properties"));
+
+        Object = beanFactory.createInstance(E.class);
+
         if (Object != null){
-            System.out.println("success!");
+            System.out.println("create object successfully!");
         }
+//        if (Object.getCDep() != null){
+//            System.out.println("create private class successfully!");
+//        }
     }
 }

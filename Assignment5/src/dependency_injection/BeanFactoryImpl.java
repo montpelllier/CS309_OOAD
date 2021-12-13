@@ -2,6 +2,7 @@ package dependency_injection;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.Properties;
@@ -12,6 +13,7 @@ import java.util.Properties;
 public class BeanFactoryImpl implements BeanFactory {
     Properties injectProp;
     Properties valueProp;
+
     private Properties loadPropties(File file){
         Properties prop = new Properties();
         try {
@@ -47,80 +49,76 @@ public class BeanFactoryImpl implements BeanFactory {
         return null;
     }
 
-    private Object[] getParameters(Constructor constructor) {
-        Parameter[] parameters = constructor.getParameters();
-        Object[] ParameterObjects = new Object[parameters.length];
-
-        //Object parameterObject = null;
-        //Class clz;
-        int i = 0;
-        for (Parameter p : parameters) {
-            System.out.println(p.getType());
-            ParameterObjects[i++] = p.getType();
-
-
-            //ParameterObjects
-//            if (p.getAnnotation(Value.class) != null) {
-//                System.out.println("The name of parameter:" + p.getName());
-//                System.out.println("The type of parameter:" + p.getType().getName());
-//                Value valueAnnotation = p.getAnnotation(Value.class);
-//                System.out.println("value = " + valueAnnotation.value());
-//                System.out.println("delimiter = " + valueAnnotation.delimiter());
-//
-//            }
-        }
-        return ParameterObjects;
-    }
-
     private boolean isBaseType(Class clazz){
         return clazz == byte.class || clazz == short.class || clazz == int.class || clazz == long.class || clazz == float.class || clazz == double.class || clazz == boolean.class || clazz == char.class || clazz == String.class;
     }
     @Override
     public <T> T createInstance(Class<T> clazz) {
-        Constructor constructor = getConstructor(clazz);
+        //1.若为抽象类or接口，找到实现类
+        String className = injectProp.getProperty(clazz.getName());
+        Class clz = null;
+        if (className != null){
+            try {
+                clz = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }else clz = clazz;
 
-        //System.out.println(constructor);
-        Class[] fieldTypes = constructor.getParameterTypes();
-        Object[] objects = new Object[fieldTypes.length];
-        for (int i=0;i<fieldTypes.length;i++){
+        Constructor constructor = getConstructor(clz);//2.找到构造器: 带有inject注解或者为默认构造器
+//        System.out.println(constructor);
+        Class[] fieldTypes = constructor.getParameterTypes();//3.找到构造函数要求的参数类型
+        Object[] objects = new Object[fieldTypes.length];//4.创建存放参数的Object数组
+        for (int i=0;i<fieldTypes.length;i++){//5.根据参数类型和注解创建object
             if (isBaseType(fieldTypes[i])){
                 //objects[i] = fieldTypes
             }else {
                 objects[i] = createInstance(fieldTypes[i]);
             }
-            System.out.println(fieldTypes[i]);
         }
 
-        //Object[] objects = getParameters(constructor);
-        T object = null;
+        T instance = null;
         try {
-            object =  (T) constructor.newInstance(objects);
+            instance =  (T) constructor.newInstance(objects);//6.根据构造函数和object创建了实例
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-//        Parameter[] parameters = constructor.getParameters();
-//        Object parameterObject = null;
-//        for (Parameter p : parameters) {
-//            if (p.getAnnotation(Value.class) != null) {
-//                System.out.println("The name of parameter:" + p.getName());
-//                System.out.println("The type of parameter:" + p.getType().getName());
-//                Value valueAnnotation = p.getAnnotation(Value.class);
-//                System.out.println("value = " + valueAnnotation.name());
-//                System.out.println("delimiter = " + valueAnnotation.delimiter());
-//
-//                if (p.getType() == boolean[].class) {
-//                    String[] strings = valueAnnotation.name().split(valueAnnotation.delimiter());
-//                    boolean[] booleans = new boolean[strings.length];
-//                    for (int i = 0; i < strings.length; i++) {
-//                        booleans[i] = Boolean.parseBoolean(strings[i]);
-//                    }
-//                    parameterObject = booleans;
-//                }
-//            }
-//        }
+        //7.找到实例有的参数类型，并检查注解
+        Field[] clazzFields = clz.getDeclaredFields();//得到所有的成员变量
+        for (Field f: clazzFields) {
+            if (f.getAnnotation(Inject.class) != null){
+                boolean isPrivate = Modifier.isPrivate(f.getModifiers());
+                if (isPrivate) f.setAccessible(true);
+                Object temp = createInstance(f.getType());
+                try {
+                    f.set(instance, temp);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                if (isPrivate) f.setAccessible(false);
+            }
+        }
+        //8.通过inject的方法set值
+        Method[] methods = clz.getDeclaredMethods();//找到所有method
+        for (Method m: methods) {
+            if (m.getAnnotation(Inject.class) != null){
+                System.out.println("inject");
 
+                fieldTypes = m.getParameterTypes();//3.找到构造函数要求的参数类型
+                objects = new Object[fieldTypes.length];//4.创建存放参数的Object数组
+                for (int i=0;i<fieldTypes.length;i++) {//5.根据参数类型和注解创建object
+                    objects[i] = createInstance(fieldTypes[i]);
+                }
 
+                try {
+                    m.invoke(instance, objects);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+            //System.out.println(m);
+        }
 
-        return object;
+        return instance;
     }
 }
