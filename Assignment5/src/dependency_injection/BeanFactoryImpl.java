@@ -49,18 +49,23 @@ public class BeanFactoryImpl implements BeanFactory {
     private Object getValue(String string, Class clazz, Value val) {
         if (clazz == String.class) {
             if (string.length() >= val.min() && string.length() <= val.max()) return string;
+            else return "default value";
         } else if (clazz == int.class) {
             int temp = Integer.parseInt(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
+            else return 0;
         } else if (clazz == byte.class) {
             byte temp = Byte.parseByte(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
+            else return 0;
         } else if (clazz == short.class) {
             short temp = Short.parseShort(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
+            else return 0;
         } else if (clazz == long.class) {
             long temp = Long.parseLong(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
+            else return 0;
         } else if (clazz == char.class) {
             return string.charAt(0);
         } else if (clazz == boolean.class) {
