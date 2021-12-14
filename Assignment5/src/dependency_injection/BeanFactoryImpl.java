@@ -53,19 +53,15 @@ public class BeanFactoryImpl implements BeanFactory {
         } else if (clazz == int.class) {
             int temp = Integer.parseInt(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
-            else return 0;
         } else if (clazz == byte.class) {
             byte temp = Byte.parseByte(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
-            else return 0;
         } else if (clazz == short.class) {
             short temp = Short.parseShort(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
-            else return 0;
         } else if (clazz == long.class) {
             long temp = Long.parseLong(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
-            else return 0;
         } else if (clazz == char.class) {
             return string.charAt(0);
         } else if (clazz == boolean.class) {
@@ -74,9 +70,28 @@ public class BeanFactoryImpl implements BeanFactory {
         return null;
     }
 
+    private Object defaultValue(Class clazz, Value val){
+        if (clazz == String.class) {
+            return "default value";
+        } else if (clazz == int.class) {
+            return 0;
+        } else if (clazz == byte.class) {
+            return (byte) 0;
+        } else if (clazz == short.class) {
+            return (short) 0;
+        } else if (clazz == long.class) {
+            return (long) 0;
+        }
+//        else if (clazz == char.class) {
+//            return string.charAt(0);
+//        } else if (clazz == boolean.class) {
+//            return Boolean.parseBoolean(string);
+//        }
+        return null;
+    }
     //  Value includes: byte, short, int, long, float, double, boolean, char, String
-//  May have multiple value: byte, short, int, long, String 需要min,max取值
-//  Default value: 0 or "default value"
+    //  May have multiple value: byte, short, int, long, String 需要min,max取值
+    //  Default value: 0 or "default value"
     @Override
     public <T> T createInstance(Class<T> clazz) {
         //1.若为抽象类or接口，找到实现类
@@ -105,6 +120,9 @@ public class BeanFactoryImpl implements BeanFactory {
                         objects[i] = tmp;
                         break;
                     }
+                }
+                if (objects[i] == null){
+                    objects[i] = defaultValue(parameters[i].getType(), val);
                 }
             } else objects[i] = createInstance(parameters[i].getType());
         }
