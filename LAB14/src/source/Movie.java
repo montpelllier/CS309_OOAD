@@ -46,14 +46,7 @@ public class Movie {
     }
 
     int getFrequentRenterPoints(int daysRented) {
-        int frequentRenterPoints = 0;
-        frequentRenterPoints++;
-        // add bonus for a two day new release rental
-
-        if ((getPriceCode() == Movie.NEW_RELEASE)
-                && daysRented > 1) frequentRenterPoints++;
-
-        return frequentRenterPoints;
+        return _price.getFrequentRenterPoints();
     }
 
     public class ChildrensPrice extends Price{
@@ -83,6 +76,11 @@ public class Movie {
             double result = 0;
             result += daysRented * 3;
             return result;
+        }
+
+        @Override
+        int getFrequentRenterPoints() {
+            return 2;
         }
     }
     public class RegularPrice extends Price {
