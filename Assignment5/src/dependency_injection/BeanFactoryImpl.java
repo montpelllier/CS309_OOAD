@@ -1,5 +1,7 @@
 package dependency_injection;
 
+import testclass.EImpl;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -34,7 +36,7 @@ public class BeanFactoryImpl implements BeanFactory {
         valueProp = loadProperties(file);
     }
 
-    public <T> Constructor getConstructor(Class<T> clazz) {
+    private  <T> Constructor getConstructor(Class<T> clazz) {//获取构造器
         Constructor[] constructors = clazz.getDeclaredConstructors();
         if (constructors.length == 1) {
             return constructors[0];
@@ -46,10 +48,9 @@ public class BeanFactoryImpl implements BeanFactory {
         return null;
     }
 
-    private Object getValue(String string, Class clazz, Value val) {
+    private Object getValue(String string, Class clazz, Value val) {//通过value类获取参数取值
         if (clazz == String.class) {
             if (string.length() >= val.min() && string.length() <= val.max()) return string;
-            else return "default value";
         } else if (clazz == int.class) {
             int temp = Integer.parseInt(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
@@ -62,6 +63,12 @@ public class BeanFactoryImpl implements BeanFactory {
         } else if (clazz == long.class) {
             long temp = Long.parseLong(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
+        } else if (clazz == float.class) {
+            float temp = Float.parseFloat(string);
+            if (temp >= val.min() && temp <= val.max()) return temp;
+        } else if (clazz == double.class) {
+            double temp = Double.parseDouble(string);
+            if (temp >= val.min() && temp <= val.max()) return temp;
         } else if (clazz == char.class) {
             return string.charAt(0);
         } else if (clazz == boolean.class) {
@@ -70,25 +77,38 @@ public class BeanFactoryImpl implements BeanFactory {
         return null;
     }
 
-    private Object defaultValue(Class clazz, Value val){
-        if (clazz == String.class) {
-            return "default value";
-        } else if (clazz == int.class) {
-            return 0;
-        } else if (clazz == byte.class) {
-            return (byte) 0;
-        } else if (clazz == short.class) {
-            return (short) 0;
-        } else if (clazz == long.class) {
-            return (long) 0;
-        }
-//        else if (clazz == char.class) {
-//            return string.charAt(0);
-//        } else if (clazz == boolean.class) {
-//            return Boolean.parseBoolean(string);
-//        }
-        return null;
+    private Object defaultValue(Class clazz){
+        if (clazz == String.class) return "default value";
+        else if (clazz == int.class) return 0;
+        else if (clazz == byte.class) return (byte) 0;
+        else if (clazz == short.class) return (short) 0;
+        else if (clazz == long.class) return (long) 0;
+        else if (clazz == float.class) return (float) 0;
+        else if (clazz == double.class) return (double) 0;
+        else return createInstance(clazz);
     }
+
+    private Object[] getFunctionParameters(Parameter[] parameters){
+        Object[] objects = new Object[parameters.length];//4.创建存放参数的Object数组
+        for (int i = 0; i < parameters.length; i++) {//5.根据参数类型和注解创建object
+            Value val = parameters[i].getAnnotation(Value.class);
+            if (val != null) {
+                String[] data = valueProp.getProperty(val.value()).split(val.delimiter());
+                for (String s : data) {
+                    Object tmp = getValue(s, parameters[i].getType(), val);
+                    if (tmp != null) {
+                        objects[i] = tmp;
+                        break;
+                    }
+                }
+            }
+            if (objects[i] == null){
+                objects[i] = defaultValue(parameters[i].getType());
+            }
+        }
+        return objects;
+    }
+
     //  Value includes: byte, short, int, long, float, double, boolean, char, String
     //  May have multiple value: byte, short, int, long, String 需要min,max取值
     //  Default value: 0 or "default value"
@@ -106,31 +126,19 @@ public class BeanFactoryImpl implements BeanFactory {
         } else clz = clazz;
 
         Constructor constructor = getConstructor(clz);//2.找到构造器: 带有inject注解或者为默认构造器
-//        System.out.println(constructor);
-        Parameter[] parameters = constructor.getParameters();//3.找到构造函数要求的参数类型
-        Object[] objects = new Object[parameters.length];//4.创建存放参数的Object数组
-        for (int i = 0; i < parameters.length; i++) {//5.根据参数类型和注解创建object
-            Value val = parameters[i].getAnnotation(Value.class);
-            if (val != null) {
-//                System.out.println("5."+parameters[i].getAnnotation(Value.class));
-                String[] data = valueProp.getProperty(val.value()).split(val.delimiter());
-                for (String s : data) {
-                    Object tmp = getValue(s, parameters[i].getType(), val);
-                    if (tmp != null) {
-                        objects[i] = tmp;
-                        break;
-                    }
-                }
-                if (objects[i] == null){
-                    objects[i] = defaultValue(parameters[i].getType(), val);
-                }
-            } else objects[i] = createInstance(parameters[i].getType());
-        }
+        System.out.println(constructor);
+        if (constructor == null) System.out.println("null class:"+clz);
+
+        //3.找到构造函数要求的参数; 4.创建存放参数的Object数组
+        assert constructor != null;
+        Object[] objects = getFunctionParameters(constructor.getParameters());
 
         T instance = null;
         try {
             instance = (T) constructor.newInstance(objects);//6.根据构造函数和object创建了实例
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+            System.out.println(constructor);
+            for (Object o: objects) System.out.println(o);
             e.printStackTrace();
         }
         //7.找到实例有的参数类型，并检查注解
@@ -166,14 +174,14 @@ public class BeanFactoryImpl implements BeanFactory {
         //8.通过inject的方法set值
         Method[] methods = clz.getDeclaredMethods();//找到所有method
         for (Method m : methods) {
-            if (m.getAnnotation(Inject.class) != null) {
-                Class[] fieldTypes = m.getParameterTypes();//3.找到构造函数要求的参数类型
-                objects = new Object[fieldTypes.length];//4.创建存放参数的Object数组
-                for (int i = 0; i < fieldTypes.length; i++) objects[i] = createInstance(fieldTypes[i]);
+            if (m.getAnnotation(Inject.class) != null) {//通过Inject注入参数
+                objects = getFunctionParameters(m.getParameters());
 
                 try {
                     m.invoke(instance, objects);
-                } catch (IllegalAccessException | InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                    System.out.println(m);
+                    for (Object o: objects) System.out.println(o);
                     e.printStackTrace();
                 }
             }
