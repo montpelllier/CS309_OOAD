@@ -1,13 +1,13 @@
-package source;
+import java.util.Date;
 
 class Rental {
     private final Movie movie = new Movie("movie_title", Movie.REGULAR);
 
     private int _daysRented;
-    public Rental(String title, int priceCode, DateRange dateRange) {
+    public Rental(String title, int priceCode, Date start, Date end) {
         movie.setTitle(title);
         movie.set_priceCode(priceCode);
-        _daysRented = (int)((dateRange.end().getTime() - dateRange.start().getTime()) / (1000 * 60 * 60 * 24));
+        _daysRented = (int)((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     }
     public int getDaysRented() {
         return _daysRented;
