@@ -1,5 +1,3 @@
-package source;
-
 import java.util.Vector;
 
 class Customer {
@@ -43,7 +41,7 @@ class Customer {
         return result;
     }
 
-    public double getTotalFrequentRenterPoints() {
+    public int getTotalFrequentRenterPoints() {
         int result = 0;
         for (Rental each : _rentals) {
             result += each.getFrequentRenterPoints();
