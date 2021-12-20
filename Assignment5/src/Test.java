@@ -9,20 +9,26 @@ import testclass.*;
 public class Test {
     public static void main(String[] args) throws InvocationTargetException, InstantiationException, IllegalAccessException {
 
-//        BeanFactoryImpl beanFactory = new BeanFactoryImpl();
-//        beanFactory.loadInjectProperties(new File("./Assignment5/local-inject.properties"));
-//        beanFactory.loadValueProperties(new File("./Assignment5/local-value.properties"));
-//        PrivateTest object = beanFactory.createInstance(PrivateTest.class);
-//        //Object = beanFactory.createInstance(J.class);
-//
-//        if (object != null){
-//            System.out.println("\ncreate object successfully!");
-//        }
-//        //System.out.println(Object.isBool());
-//        object.Display();
+        BeanFactoryImpl beanFactory = new BeanFactoryImpl();
+        beanFactory.loadInjectProperties(new File("./Assignment5/local-inject.properties"));
+        beanFactory.loadValueProperties(new File("./Assignment5/local-value.properties"));
+        PrivateTest object = beanFactory.createInstance(PrivateTest.class);
+        //Object = beanFactory.createInstance(J.class);
+        J jObject = beanFactory.createInstance(J.class);
 
-        PrivateTest a = new PrivateTest(null, "1", null, 3.2, null);
-        a.Display();
+        if (object != null){
+            System.out.println("\ncreate object successfully!");
+        }
+        //System.out.println(Object.isBool());
+        object.Display();
+
+        if (jObject != null){
+            System.out.println("\ncreate object successfully!");
+        }
+        //System.out.println(Object.isBool());
+        jObject.display();
+        //PrivateTest a = new PrivateTest(null, "1", null, 3.2, null);
+//        a.Display();
 
 
 

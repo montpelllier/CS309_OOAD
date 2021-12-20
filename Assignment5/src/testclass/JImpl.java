@@ -30,4 +30,10 @@ public class JImpl implements J {
     public String getString() {
         return string;
     }
+
+    public void display(){
+        System.out.println(eDep);
+        System.out.println(integer);
+        System.out.println(string);
+    }
 }

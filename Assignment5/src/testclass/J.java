@@ -7,5 +7,7 @@ public interface J {
 
     String getString();
 
+    void display();
+
 //    void setStrings(String[] strings);
 }

@@ -15,6 +15,7 @@ import java.util.Properties;
 public class BeanFactoryImpl implements BeanFactory {
     Properties injectProp;
     Properties valueProp;
+    int cnt;
 
     private Properties loadProperties(File file) {
         Properties prop = new Properties();
@@ -64,11 +65,9 @@ public class BeanFactoryImpl implements BeanFactory {
             long temp = Long.parseLong(string);
             if (temp >= val.min() && temp <= val.max()) return temp;
         } else if (clazz == float.class) {
-            float temp = Float.parseFloat(string);
-            if (temp >= val.min() && temp <= val.max()) return temp;
+            return Float.parseFloat(string);
         } else if (clazz == double.class) {
-            double temp = Double.parseDouble(string);
-            if (temp >= val.min() && temp <= val.max()) return temp;
+            return Double.parseDouble(string);
         } else if (clazz == char.class) {
             return string.charAt(0);
         } else if (clazz == boolean.class) {
@@ -85,6 +84,8 @@ public class BeanFactoryImpl implements BeanFactory {
         else if (clazz == long.class) return (long) 0;
         else if (clazz == float.class) return (float) 0;
         else if (clazz == double.class) return (double) 0;
+        else if (clazz == char.class) return (char) 0;
+        else if (clazz == boolean.class) return true;
         else return createInstance(clazz);
     }
 
@@ -126,7 +127,7 @@ public class BeanFactoryImpl implements BeanFactory {
         } else clz = clazz;
 
         Constructor constructor = getConstructor(clz);//2.找到构造器: 带有inject注解或者为默认构造器
-        System.out.println(constructor);
+        System.out.println("constructor of "+clz+": "+constructor);
         if (constructor == null) System.out.println("null class:"+clz);
 
         //3.找到构造函数要求的参数; 4.创建存放参数的Object数组
@@ -143,10 +144,12 @@ public class BeanFactoryImpl implements BeanFactory {
         }
         //7.找到实例有的参数类型，并检查注解
         Field[] clazzFields = clz.getDeclaredFields();//得到所有的成员变量
+        cnt = 0;
         for (Field f : clazzFields) {
             boolean isPrivate = Modifier.isPrivate(f.getModifiers());
             if (isPrivate) f.setAccessible(true);
             if (f.getAnnotation(Inject.class) != null) {
+                System.out.println("field "+(cnt++)+" of "+clz+": "+f);
                 Object temp = createInstance(f.getType());
                 try {
                     f.set(instance, temp);
@@ -154,6 +157,7 @@ public class BeanFactoryImpl implements BeanFactory {
                     e.printStackTrace();
                 }
             } else if (f.getAnnotation(Value.class) != null) {
+                System.out.println("field "+(cnt++)+" of "+clz+": "+f);
                 Value val = f.getAnnotation(Value.class);
 //                System.out.println("7."+val);
                 String[] data = valueProp.getProperty(val.value()).split(val.delimiter());
@@ -168,15 +172,25 @@ public class BeanFactoryImpl implements BeanFactory {
                         break;
                     }
                 }
-                if (isPrivate) f.setAccessible(false);
+
+            } else {
+                System.out.println("null field "+(cnt++)+" of "+clz+": "+f);
+                try {
+                    f.set(instance, defaultValue(f.getType()));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
             }
+            if (isPrivate) f.setAccessible(false);
         }
         //8.通过inject的方法set值
         Method[] methods = clz.getDeclaredMethods();//找到所有method
+        cnt = 0;
         for (Method m : methods) {
             if (m.getAnnotation(Inject.class) != null) {//通过Inject注入参数
+                System.out.println("method "+(cnt++)+" of "+clz+": "+m);
                 objects = getFunctionParameters(m.getParameters());
-
                 try {
                     m.invoke(instance, objects);
                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
