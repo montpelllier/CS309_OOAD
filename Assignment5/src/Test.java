@@ -14,7 +14,7 @@ public class Test {
         beanFactory.loadValueProperties(new File("./Assignment5/local-value.properties"));
         PrivateTest object = beanFactory.createInstance(PrivateTest.class);
         //Object = beanFactory.createInstance(J.class);
-        J jObject = beanFactory.createInstance(J.class);
+        L lObject = beanFactory.createInstance(L.class);
 
         if (object != null){
             System.out.println("\ncreate object successfully!");
@@ -22,13 +22,14 @@ public class Test {
         //System.out.println(Object.isBool());
         object.Display();
 
-        if (jObject != null){
+        if (lObject != null){
             System.out.println("\ncreate object successfully!");
         }
         //System.out.println(Object.isBool());
-        jObject.display();
+        System.out.println(lObject.isBool());
         //PrivateTest a = new PrivateTest(null, "1", null, 3.2, null);
 //        a.Display();
+
 
 
 

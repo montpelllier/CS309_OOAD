@@ -85,7 +85,7 @@ public class BeanFactoryImpl implements BeanFactory {
         else if (clazz == float.class) return (float) 0;
         else if (clazz == double.class) return (double) 0;
         else if (clazz == char.class) return (char) 0;
-        else if (clazz == boolean.class) return true;
+        else if (clazz == boolean.class) return false;
         else return createInstance(clazz);
     }
 
@@ -159,10 +159,10 @@ public class BeanFactoryImpl implements BeanFactory {
             } else if (f.getAnnotation(Value.class) != null) {
                 System.out.println("field "+(cnt++)+" of "+clz+": "+f);
                 Value val = f.getAnnotation(Value.class);
-//                System.out.println("7."+val);
                 String[] data = valueProp.getProperty(val.value()).split(val.delimiter());
+                Object tmp = null;
                 for (String s : data) {
-                    Object tmp = getValue(s, f.getType(), val);
+                    tmp = getValue(s, f.getType(), val);
                     if (tmp != null) {
                         try {
                             f.set(instance, tmp);
@@ -172,16 +172,16 @@ public class BeanFactoryImpl implements BeanFactory {
                         break;
                     }
                 }
-
-            } else {
-                System.out.println("null field "+(cnt++)+" of "+clz+": "+f);
-                try {
-                    f.set(instance, defaultValue(f.getType()));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                if (tmp == null) {
+                    try {
+                        f.set(instance, defaultValue(f.getType()));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
 
             }
+            else System.out.println("null field "+(cnt++)+" of "+clz+": "+f);
             if (isPrivate) f.setAccessible(false);
         }
         //8.通过inject的方法set值
