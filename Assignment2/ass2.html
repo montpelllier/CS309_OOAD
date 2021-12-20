@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hotel List</title>
+    <link rel="stylesheet" type="text/css" href="ass2.css"/>
+    <script type="text/javascript" src="ass2.js"></script>
+</head>
+
+<body>
+
+
+    <table id="table">
+        <caption id="a"><h2>Hotel List</h2></caption>
+
+        <div class="add">
+            <input type="button" value="Add Hotel" class="button" onclick=onClickAddHotel()>
+            <dd></dd>
+        </div>
+
+        <tr>
+            <th>Hotel Name</th>
+            <th>City</th>
+            <th>District</th>
+            <th>Date</th>
+            <th>Earliest check-in time</th>
+            <th>price</th>
+            <th>Room Type</th>
+            <th>Operation</th>
+            <th hidden="hidden">ID</th>
+        </tr>
+
+        <tbody id="tbody" style="display: none">
+        <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>
+                <input type="button" value="Delete" class="button" onclick='{
+                    if(confirm("确定要删除吗?")) {
+                        deleteRow(this);
+                    }else {} }'>
+            </td>
+            <td>id</td>
+
+        </tr>
+        </tbody>
+
+    </table>
+
+    <div class="form" id="form">
+
+        <form name="form">
+            Hotel Name:
+            <label>
+                <input type="text" name="hotel name" id="name"/>
+            </label>
+            <br/> City:
+            <form>
+                <label>
+                    <input type="radio" name="city" value="GUANG ZHOU" onchange="districtChange(this.value)" >
+                </label>GUANG ZHOU
+                <label>
+                    <input type="radio" name="city" value="SHEN ZHEN" onchange="districtChange(this.value)">
+                </label>SHEN ZHEN
+            </form>
+            District:
+            <label for="district"></label>
+            <select id="district">
+                <option>LI WAN</option>
+                <option>YUE XIU</option>
+                <option>HAI ZHU</option>
+                <option>TIAN HE</option>
+                <option>BAI YUN</option>
+                <option>HUANG PU</option>
+                <option>FAN YU</option>
+                <option>HUA DU</option>
+                <option>NAN SHA</option>
+                <option>CONG HUA</option>
+                <option>ZENG CHENG</option>
+<!--                深圳市的区-->
+                <option>FU TIAN</option>
+                <option>NAN SHAN</option>
+                <option>LUO HU</option>
+                <option>LONG GANG</option>
+                <option>PING SHAN</option>
+                <option>LONG HUA</option>
+                <option>GUANG MING</option>
+                <option>YAN TIAN</option>
+            </select>
+            <br/> Date:
+            <label>
+                <input type="date" name="date" id="date"/>
+            </label>
+            <br/> Earliest check-in time:
+            <label>
+                <input type="time" name="check-in time" id="time"/>
+            </label>
+            <br/> price:
+            <label>
+                <input type="text" name="price" id="price"/>
+            </label>
+            <br/> Room Type:
+            <label for="type"></label>
+            <select id="type">
+                <option>Standard Room</option>
+                <option>King Bed Room</option>
+                <option>Family Room</option>
+                <option>Presidential Suite</option>
+            </select>
+            <br/>
+            <br>
+            <input type="image" value="" src="confirm.png" class="image_button" onclick="onClickConfirm()" alt="Confirm">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="image" value="" src="close.png" class="image_button" onclick="onClickClose()" alt="Close">
+            <br/>
+        </form>
+    </div>
+
+    <div class="black_overlay" id="fade"></div>
+
+</body>
+</html>
