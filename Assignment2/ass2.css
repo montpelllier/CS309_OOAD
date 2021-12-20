@@ -1,0 +1,94 @@
+@CHARSET "UTF-8";
+#a {
+    color: black;
+    font-family: "Segoe Script", serif ;
+    font-size: 24px;
+}
+
+body {
+    background-size: auto;
+    background-image: url("background1.jpg");
+}
+
+table {
+    /*border: 2px solid rgb(161, 16, 16);*/
+    background: orange;
+    margin: 0 auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
+}
+
+th {
+    font-family: "Tempus Sans ITC", serif;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 15px;
+}
+td {
+    font-family: "Tempus Sans ITC", serif;
+    border: 2px solid #ffffff;
+    padding: 15px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.evenColor{
+    background-color: #ffe1b9;
+}
+
+.oddColor{
+    background-color: #f8ecda;
+}
+
+.add{
+    line-height: 20px;
+    text-align: left;
+    font-size: 40px;
+}
+
+.form{
+    font-family: "Cambria Math", serif;
+    display: none;
+    position: absolute;
+    top: 12%;
+    left: 30%;
+    width: 30%;
+    height: 64%;
+    line-height: 40px;
+    text-align: center;
+    padding: 20px;
+    border: 10px solid orange;
+    border-radius: 25px;
+    background-color: #ffe9b9;
+    font-size: 24px;
+    z-index: 1002;
+    overflow: auto;
+}
+
+.black_overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 150%;
+    height: 180%;
+    background-color: black;
+    z-index: 1001;
+    -moz-opacity: 0.8;
+    opacity: .80;
+    filter: alpha(opacity=88);
+}
+
+.button {
+    font-family: "Tempus Sans ITC", serif;
+    background-color: lightgray;
+    border-radius: 10px;
+}
+
+.image_button{
+    width: 40px;
+    height: 40px;
+}
